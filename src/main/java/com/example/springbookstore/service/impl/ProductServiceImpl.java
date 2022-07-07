@@ -30,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(number).get();
         log.info("[getProduct] input number : {}",number);
 
+        log.info("[getProduct] product number : {},name: {} ",product.getName());
         ProductResponseDto dto = new ProductResponseDto();
         dto.setNumber(product.getNumber());
         dto.setName(product.getName());
@@ -39,60 +40,49 @@ public class ProductServiceImpl implements ProductService {
 
         return dto;
     }
-
     @Override
     public ProductResponseDto saveProduct(ProductDto dto) {
-        return null;
+        log.info("[saveProduct] productDTO : {}",dto.toString());
+
+        Product product = Product.builder()
+                .name(dto.getName())
+                .price(dto.getPrice())
+                .stock(dto.getStock())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        Product saveProduct = productRepository.save(product);
+        log.info("[saveProduct] saveProduct : {}",saveProduct);
+        //저장한 데이터가 무엇인지 알아야하기에 리턴값이 있다.
+        ProductResponseDto responseDto = ProductResponseDto.builder()
+                .number(saveProduct.getNumber())
+                .name(saveProduct.getName())
+                .price(saveProduct.getPrice())
+                .stock(saveProduct.getStock())
+                .build();
+        return responseDto;
     }
 
     @Override
     public ProductResponseDto changeProductName(Long number, String name) throws Exception {
-        return null;
+        Product foundProduct = productRepository.findById(number).get();
+        foundProduct.setName(name);
+        Product changeName = productRepository.save(foundProduct);
+
+        ProductResponseDto dto = ProductResponseDto.builder()
+                .number(changeName.getNumber())
+                .name(changeName.getName())
+                .price(changeName.getPrice())
+                .stock(changeName.getStock())
+                .build();
+
+        return dto;
     }
 
     @Override
     public void deleteProduct(Long number) throws Exception {
-
+        productRepository.deleteById(number);
+            //repository에서 delete는 반환타입이 없다 그래서 여기도 없다
     }
-
-//    @Override
-//    public ProductResponseDto saveProduct(ProductDto dto) {
-//        Product product = Product.builder()
-//                .name(dto.getName())
-//                .price(dto.getPrice())
-//                .stock(dto.getStock())
-//                .createdAt(LocalDateTime.now())
-//                .updatedAt(LocalDateTime.now())
-//                .build();
-//
-//        Product saveProduct = dao.insertProduct(product);
-//        //저장한 데이터가 무엇인지 알아야하기에 리턴값이 있다.
-//        ProductResponseDto responseDto = ProductResponseDto.builder()
-//                .number(saveProduct.getNumber())
-//                .name(saveProduct.getName())
-//                .price(saveProduct.getPrice())
-//                .stock(saveProduct.getStock())
-//                .build();
-//        return null;
-//    }
-//
-//    @Override
-//    public ProductResponseDto changeProductName(Long number, String name) throws Exception {
-//        Product changedProduct = dao.updateProductName(number,name);
-//
-//
-//        ProductResponseDto dto = ProductResponseDto.builder()
-//                .number(changedProduct.getNumber())
-//                .name(changedProduct.getName())
-//                .price(changedProduct.getPrice())
-//                .stock(changedProduct.getStock())
-//                .build();
-//
-//        return dto;
-//    }
-//
-//    @Override
-//    public void deleteProduct(Long number) throws Exception {
-//            //repository에서 delete는 반환타입이 없다 그래서 여기도 없다
-//    }
 }
